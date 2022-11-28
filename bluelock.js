@@ -30,7 +30,7 @@ if (BUILD == "Test") {
   serverUrl = "https://0d7d-2601-5ca-c300-47f0-e480-39bd-f43-8cf5.ngrok.io";
 }
 const TELEGRAM_API = `https://api.telegram.org/bot${TOKEN}`;
-const URI = `/app2/${TOKEN}`;
+const URI = `/app3/${TOKEN}`;
 const WEBHOOK_URL = serverUrl + URI;
 
 // -> Websocket
