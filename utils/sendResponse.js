@@ -14,8 +14,12 @@ function sendMessage(api, chat, msg, button, msgID) {
           inline_keyboard: [
             [
               {
-                text: button[0],
-                url: button[1],
+                text: button[0][0],
+                url: button[0][1],
+              },
+              {
+                text: button[1][0],
+                url: button[1][1],
               },
             ],
           ],
@@ -48,8 +52,12 @@ function sendPhoto(api, chat, image, text, button, msgID) {
           inline_keyboard: [
             [
               {
-                text: button[0],
-                url: button[1],
+                text: button[0][0],
+                url: button[0][1],
+              },
+              {
+                text: button[1][0],
+                url: button[1][1],
               },
             ],
           ],

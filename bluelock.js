@@ -106,8 +106,11 @@ app.post(URI, async (req, res) => {
             sendMessage(
               TELEGRAM_API,
               chatId,
-              `*Total $ISAGI burned:*\n${(totalBurned / 10 ** decimals).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ($${(tokenPrice * (totalBurned / 10 ** decimals)).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}) (${percentBurned.toFixed(2)}%)`,
-              ["Buy on Pancakeswap", `https://pancakeswap.finance/swap?outputCurrency=0xBe010d8f1adc0371FEacEe63270B8b3c0e793cb3`],
+              `*🔥 Total $ISAGI burned:*\n${(totalBurned / 10 ** decimals).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ($${(tokenPrice * (totalBurned / 10 ** decimals)).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}) (${percentBurned.toFixed(2)}%)`,
+              [
+                ["Buy On Pancakeswap", `https://pancakeswap.finance/swap?outputCurrency=0xBe010d8f1adc0371FEacEe63270B8b3c0e793cb3`],
+                ["Stake Your Tokens", `https://stake.bluelock-inu.com/`],
+              ],
               messageId
             );
           } catch (err) {
