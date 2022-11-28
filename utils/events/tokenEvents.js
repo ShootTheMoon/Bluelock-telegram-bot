@@ -29,7 +29,7 @@ const tokenEvents = async (web3, tokenContract, totalTokenSupply, decimals, TELE
               TELEGRAM_API,
               group.chatId,
               "https://i.imgur.com/yVJOsJ8.mp4",
-              `⚽️ *Initiating Bluelock Protocol* ⚽️\n\n🔥 *Contract successfully buyback & burn*:\n${burned.toFixed(2).toString()} ($${(tokenPrice * burned).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")})\n\n💠 *Accumulated $ISAGI burned*:\n${(totalBurned / 10 ** decimals)
+              `⚽️ *Initiating Bluelock Protocol* ⚽️\n\n🔥 *Contract successfully boughtbacked & burned*:\n${burned.toFixed(2).toString()} ($${(tokenPrice * burned).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")})\n\n💠 *Accumulated $ISAGI burned*:\n${(totalBurned / 10 ** decimals)
                 .toFixed(0)
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ($${(tokenPrice * (totalBurned / 10 ** decimals)).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}) (${percentBurned.toFixed(2)}%)`,
               [

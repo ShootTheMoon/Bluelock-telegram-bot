@@ -97,8 +97,12 @@ function sendVideo(api, chat, video, text, button, msgID) {
           inline_keyboard: [
             [
               {
-                text: button[0],
-                url: button[1],
+                text: button[0][0],
+                url: button[0][1],
+              },
+              {
+                text: button[1][0],
+                url: button[1][1],
               },
             ],
           ],
