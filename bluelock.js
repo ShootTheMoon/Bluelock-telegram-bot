@@ -10,7 +10,7 @@ const path = require("path");
 // const scriptName = path.basename(__filename).replace(".js", "");
 
 // -> Global variables
-const { TOKEN, SERVER_URL, TOKEN_ADDRESS, BUILD, WS_API_KEY, PORT } = process.env;
+const { TOKEN, SERVER_URL, TOKEN_ADDRESS, STAKING_ADDRESS, BUILD, WS_API_KEY, PORT } = process.env;
 
 // -> Function Imports
 const { getTokenPrice } = require("./utils/getTokenPrice");
@@ -27,7 +27,7 @@ app.use(bodyParser.json());
 // -> Webhook
 let serverUrl = SERVER_URL;
 if (BUILD == "Test") {
-  serverUrl = "https://e68a-2601-5ca-c300-47f0-e480-39bd-f43-8cf5.ngrok.io";
+  serverUrl = "https://0d7d-2601-5ca-c300-47f0-e480-39bd-f43-8cf5.ngrok.io";
 }
 const TELEGRAM_API = `https://api.telegram.org/bot${TOKEN}`;
 const URI = `/app2/${TOKEN}`;
@@ -64,9 +64,13 @@ let tokenAbi = fs.readFileSync("./blockchain/tokenAbi.json");
 tokenAbi = JSON.parse(tokenAbi);
 let routerAbi = fs.readFileSync("./blockchain/routerAbi.json");
 routerAbi = JSON.parse(routerAbi);
+let stakingAbi = fs.readFileSync("./blockchain/stakingAbi.json");
+stakingAbi = JSON.parse(stakingAbi);
 const web3 = new Web3(ws);
 const tokenAddress = TOKEN_ADDRESS.toLowerCase();
 const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
+const stakingAddress = STAKING_ADDRESS.toLowerCase();
+const stakingContract = new web3.eth.Contract(stakingAbi, stakingAddress);
 
 let totalTokenSupply, decimals;
 
@@ -86,7 +90,7 @@ app.post(URI, async (req, res) => {
       const chatId = req.body.message.chat.id;
       const command = req.body.message.text;
       const messageId = req.body.message.message_id;
-      if (command === "/blbot") {
+      if (command.toLowerCase() === "/blbot") {
         if (checkIfAdded(chatId) === false) {
           const addToGroup = addToGroups(chatId);
           if (addToGroup) {
@@ -97,7 +101,7 @@ app.post(URI, async (req, res) => {
         } else {
           sendMessage(TELEGRAM_API, chatId, `*Bluelock Bot already active*`, false, messageId);
         }
-      } else if (command === "/burned") {
+      } else if (command.toLowerCase() === "/burned") {
         if (checkIfAdded(chatId) == true) {
           try {
             const tokenPrice = await getTokenPrice(web3);
@@ -117,7 +121,36 @@ app.post(URI, async (req, res) => {
             console.log(err);
           }
         }
-      }
+      } else if (command.toLowerCase() === "/staking")
+        if (checkIfAdded(chatId) == true) {
+          try {
+            const tokenPrice = await getTokenPrice(web3);
+            console.log(tokenPrice);
+            const rewardsRemaining = parseInt(await stakingContract.methods.rewardsRemaining().call());
+            console.log(rewardsRemaining);
+            const amountStaked = parseInt(await stakingContract.methods.totalStaked().call());
+            console.log(amountStaked);
+            const percentStaked = (amountStaked / totalTokenSupply) * 100;
+            console.log(percentStaked);
+            sendMessage(
+              TELEGRAM_API,
+              chatId,
+              `💠 *Total $ISAGI Staked:*\n${(amountStaked / 10 ** decimals).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ($${(tokenPrice * (amountStaked / 10 ** decimals)).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}) (${percentStaked.toFixed(2)}%)\n\n⏳ *Staking Rewards Remaining:*\n${(
+                rewardsRemaining /
+                10 ** decimals
+              )
+                .toFixed(0)
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ($${(tokenPrice * (rewardsRemaining / 10 ** decimals)).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")})`,
+              [
+                ["Buy On Pancakeswap", `https://pancakeswap.finance/swap?outputCurrency=0xBe010d8f1adc0371FEacEe63270B8b3c0e793cb3`],
+                ["Stake Your Tokens", `https://stake.bluelock-inu.com/`],
+              ],
+              messageId
+            );
+          } catch (err) {
+            console.log(err);
+          }
+        }
       // else if (command.split(" ")[0] == "/nftlookup") {
       //   if (checkIfAdded(chatId) == true) {
       //     const nftID = parseInt(command.split(" ")[1]);

@@ -2,7 +2,6 @@ const axios = require("axios");
 
 function sendMessage(api, chat, msg, button, msgID) {
   if (button) {
-    console.log("button");
     axios
       .post(`${api}/sendMessage`, {
         chat_id: chat,
