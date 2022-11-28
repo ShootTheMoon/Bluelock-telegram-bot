@@ -13,6 +13,7 @@ const path = require("path");
 const { TOKEN, SERVER_URL, TOKEN_ADDRESS, BUILD, WS_API_KEY, PORT } = process.env;
 
 // -> Function Imports
+const { getTokenPrice } = require("./utils/getTokenPrice");
 const { addToGroups, checkIfAdded } = require("./utils/groupsHandlers");
 // const { nftEvents } = require("./utils/events/nftEvents");
 const { tokenEvents } = require("./utils/events/tokenEvents");
@@ -26,7 +27,7 @@ app.use(bodyParser.json());
 // -> Webhook
 let serverUrl = SERVER_URL;
 if (BUILD == "Test") {
-  serverUrl = "https://843a-2601-5ca-c300-47f0-e480-39bd-f43-8cf5.ngrok.io";
+  serverUrl = "https://e68a-2601-5ca-c300-47f0-e480-39bd-f43-8cf5.ngrok.io";
 }
 const TELEGRAM_API = `https://api.telegram.org/bot${TOKEN}`;
 const URI = `/app2/${TOKEN}`;
@@ -67,11 +68,12 @@ const web3 = new Web3(ws);
 const tokenAddress = TOKEN_ADDRESS.toLowerCase();
 const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
 
+let totalTokenSupply, decimals;
+
 const init = async () => {
   try {
-    let totalTokenSupply = parseInt(await tokenContract.methods.totalSupply().call());
-    const decimals = parseInt(await tokenContract.methods.decimals().call());
-
+    totalTokenSupply = parseInt(await tokenContract.methods.totalSupply().call());
+    decimals = parseInt(await tokenContract.methods.decimals().call());
     tokenEvents(web3, tokenContract, totalTokenSupply, decimals, TELEGRAM_API);
   } catch (err) {
     console.log(err);
@@ -94,6 +96,17 @@ app.post(URI, async (req, res) => {
           }
         } else {
           sendMessage(TELEGRAM_API, chatId, `*Bluelock Bot already active*`, messageId);
+        }
+      } else if (command === "/burned") {
+        if (checkIfAdded(chatId) == true) {
+          try {
+            const tokenPrice = await getTokenPrice(web3);
+            let totalBurned = parseInt(await tokenContract.methods.balanceOf("0x000000000000000000000000000000000000dEaD").call());
+            const percentBurned = (totalBurned / totalTokenSupply) * 100;
+            sendMessage(TELEGRAM_API, chatId, `*Total $ISAGI burned:*\n${(totalBurned / 10 ** decimals).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ($${(tokenPrice * (totalBurned / 10 ** decimals)).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}) (${percentBurned.toFixed(2)}%)`, messageId);
+          } catch (err) {
+            console.log(err);
+          }
         }
       }
       // else if (command.split(" ")[0] == "/nftlookup") {
