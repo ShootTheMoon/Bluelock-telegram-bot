@@ -1,7 +1,8 @@
 const axios = require("axios");
 
-function sendMessage(api, chat, msg, msgID, button) {
+function sendMessage(api, chat, msg, button, msgID) {
   if (button) {
+    console.log("button");
     axios
       .post(`${api}/sendMessage`, {
         chat_id: chat,
@@ -9,14 +10,16 @@ function sendMessage(api, chat, msg, msgID, button) {
         reply_to_message_id: msgID ? msgID : false,
         allow_sending_without_reply: true,
         parse_mode: "Markdown",
-        inline_keyboard: [
-          [
-            {
-              text: button[0],
-              url: button[1],
-            },
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: button[0],
+                url: button[1],
+              },
+            ],
           ],
-        ],
+        },
       })
       .catch((err) => console.log(err));
   } else {
@@ -53,7 +56,7 @@ function sendPhoto(api, chat, image, text, button, msgID) {
         },
       })
       .catch((err) => {
-        sendMessage(api, chat, "*Please try again later*", msgID);
+        sendMessage(api, chat, "*Please try again later*", false, msgID);
         console.log(err.data);
       });
   } else {
@@ -67,7 +70,7 @@ function sendPhoto(api, chat, image, text, button, msgID) {
         parse_mode: "Markdown",
       })
       .catch((err) => {
-        sendMessage(api, chat, "*Please try again later*", msgID);
+        sendMessage(api, chat, "*Please try again later*", false, msgID);
         console.log(err.data);
       });
   }

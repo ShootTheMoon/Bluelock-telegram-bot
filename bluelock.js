@@ -90,12 +90,12 @@ app.post(URI, async (req, res) => {
         if (checkIfAdded(chatId) === false) {
           const addToGroup = addToGroups(chatId);
           if (addToGroup) {
-            sendMessage(TELEGRAM_API, chatId, `*Bluelock Bot activated with chat id:* ${chatId}`, messageId);
+            sendMessage(TELEGRAM_API, chatId, `*Bluelock Bot activated with chat id:* ${chatId}`, false, messageId);
           } else {
-            sendMessage(TELEGRAM_API, chatId, `*Error starting bot with chat id:* ${chatId}`, messageId);
+            sendMessage(TELEGRAM_API, chatId, `*Error starting bot with chat id:* ${chatId}`, false, messageId);
           }
         } else {
-          sendMessage(TELEGRAM_API, chatId, `*Bluelock Bot already active*`, messageId);
+          sendMessage(TELEGRAM_API, chatId, `*Bluelock Bot already active*`, false, messageId);
         }
       } else if (command === "/burned") {
         if (checkIfAdded(chatId) == true) {
@@ -103,7 +103,13 @@ app.post(URI, async (req, res) => {
             const tokenPrice = await getTokenPrice(web3);
             let totalBurned = parseInt(await tokenContract.methods.balanceOf("0x000000000000000000000000000000000000dEaD").call());
             const percentBurned = (totalBurned / totalTokenSupply) * 100;
-            sendMessage(TELEGRAM_API, chatId, `*Total $ISAGI burned:*\n${(totalBurned / 10 ** decimals).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ($${(tokenPrice * (totalBurned / 10 ** decimals)).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}) (${percentBurned.toFixed(2)}%)`, messageId);
+            sendMessage(
+              TELEGRAM_API,
+              chatId,
+              `*Total $ISAGI burned:*\n${(totalBurned / 10 ** decimals).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ($${(tokenPrice * (totalBurned / 10 ** decimals)).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}) (${percentBurned.toFixed(2)}%)`,
+              ["Buy on Pancakeswap", `https://pancakeswap.finance/swap?outputCurrency=0xBe010d8f1adc0371FEacEe63270B8b3c0e793cb3`],
+              messageId
+            );
           } catch (err) {
             console.log(err);
           }
